@@ -1,0 +1,2 @@
+model_checkpoint_path: "/home/baxter/Documents/beta-vae/checkpoints/model.ckpt"
+all_model_checkpoint_paths: "/home/baxter/Documents/beta-vae/checkpoints/model.ckpt"

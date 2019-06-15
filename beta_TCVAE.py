@@ -7,6 +7,7 @@ from functools import partial
 import numpy as np
 from tqdm import tqdm
 import math
+import tensorflow_probability as tfp
 
 conv2d_lrelu = partial(layers.conv2d, activation_fn=tf.nn.leaky_relu, stride=2, padding='valid')
 fc_relu = partial(tf.layers.dense, activation=tf.nn.relu)
@@ -16,13 +17,13 @@ batch = 128
 
 
 def gaussian_log_density(samples, mean, log_var):
-  pi = tf.constant(math.pi)
-  normalization = tf.log(2. * pi)
-  inv_sigma = tf.exp(-log_var)
-  tmp = (samples - mean)
-  return -0.5 * (tmp * tmp * inv_sigma + log_var + normalization)
+    pi = tf.constant(math.pi)
+    normalization = tf.log(2. * pi)
+    inv_sigma = tf.exp(-log_var)
+    tmp = (samples - mean)
+    return -0.5 * (tmp * tmp * inv_sigma + log_var + normalization)
 
-class beta_VAE():
+class beta_TCVAE():
     def __init__(self,training = True, lr=0.0008):
         # input
         self.sess = tf.InteractiveSession()
@@ -34,7 +35,7 @@ class beta_VAE():
 
         if str(raw_input('Load_image_dataset?[yes/no] ')) == 'yes':
             self.load_data()
-
+        # ----------------------- Net Architecture -----------------------
         # encode
         z_mean, z_logvar = self.Enc(self.img, z_dim, is_training= self.training)
 
@@ -45,16 +46,18 @@ class beta_VAE():
             self.z = z_mean
 
         # decode
-
         self.img_rec = self.Dec(self.z, is_training=self.training)
 
-        # loss
-        reconstruction_loss = tf.losses.mean_squared_error(self.img, self.img_rec)
+        # ----------------------- Loss Definition -----------------------
+
+        per_sample_loss = self.make_reconstruction_loss(self.img, self.img_rec)
+        reconstruction_loss = tf.reduce_mean(per_sample_loss)
         kl_loss = self.compute_gaussian_kl(z_mean, z_logvar)
         regularizer = self.regularizer(kl_loss, z_mean, z_logvar, self.z)
         self.loss = tf.add(reconstruction_loss, regularizer, name="loss")
 
-        # otpim
+        # ----------------------- Optimisation Setting -----------------------
+
         update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
         with tf.control_dependencies(update_ops):
             self.step = tf.train.AdamOptimizer(learning_rate=lr, beta1=0.9, beta2 = 0.999).minimize(self.loss)
@@ -64,12 +67,44 @@ class beta_VAE():
         var_list += tf.trainable_variables()
         self.saver = tf.train.Saver(var_list=var_list, max_to_keep=1)
 
+
+    def bernoulli_loss(self, true_images,
+                       reconstructed_images,
+                       subtract_true_image_entropy=True):
+        """Computes the Bernoulli loss."""
+        flattened_dim = np.prod(true_images.get_shape().as_list()[1:])
+        reconstructed_images = tf.reshape(reconstructed_images, shape=[-1, flattened_dim])
+        true_images = tf.reshape(true_images, shape=[-1, flattened_dim])
+
+        if subtract_true_image_entropy:
+            dist = tfp.distributions.Bernoulli(
+                probs=tf.clip_by_value(true_images, 1e-6, 1 - 1e-6))
+            loss_lower_bound = tf.reduce_sum(dist.entropy(), axis=1)
+        else:
+            loss_lower_bound = 0
+
+        loss = tf.reduce_sum(
+            tf.nn.sigmoid_cross_entropy_with_logits(
+                logits=reconstructed_images, labels=true_images),
+            axis=1)
+        return loss - loss_lower_bound
+
+
+    def make_reconstruction_loss(self, true_images,
+                                 reconstructed_images):
+        """Wrapper that creates reconstruction loss."""
+        with tf.variable_scope("reconstruction_loss"):
+            per_sample_loss = self.bernoulli_loss(true_images, reconstructed_images)
+        return per_sample_loss
+
+
     def compute_gaussian_kl(self, z_mean, z_logvar):
         """Compute KL divergence between input Gaussian and Standard Normal."""
         return tf.reduce_mean(
             0.5 * tf.reduce_sum(
                 tf.square(z_mean) + tf.exp(z_logvar) - z_logvar - 1, [1]),
             name="kl_loss")
+
 
     def total_correlation(self, z, z_mean, z_logvar):
         """Estimate of total correlation on a batch.
@@ -105,9 +140,11 @@ class beta_VAE():
             keepdims=False)
         return tf.reduce_mean(log_qz - log_qz_product)
 
+
     def regularizer(self, kl_loss, z_mean, z_logvar, z_sampled):
         tc = (beta - 1.) * self.total_correlation(z_sampled, z_mean, z_logvar)
         return tc + kl_loss
+
 
     def sample_from_latent_distribution(self, z_mean, z_logvar):
         """Samples from the Gaussian distribution defined by z_mean and z_logvar."""
@@ -116,6 +153,7 @@ class beta_VAE():
             tf.exp(z_logvar / 2) * tf.random_normal(tf.shape(z_mean), 0, 1),
             name="sampled_latent_variable")
 
+
     def fit(self, epoch=50):
         for _ in tqdm(range(epoch)):
             for j in range(self.dataset.shape[0]//batch):
@@ -123,12 +161,19 @@ class beta_VAE():
                 _,loss = self.sess.run([self.step, self.loss], feed_dict={self.img: self.dataset[i:i+batch]})
                 self.loss_list.append(float(loss))
 
+
     def image_test(self, image):
+        # trainging dataset's mean and std
+        mean = 116.77986
+        std = 57.100357
         image = image.astype(np.float32)
+        image = (image-mean)/std
         img_rec = self.sess.run(self.img_rec,
                                    feed_dict={self.img: image[np.newaxis, :]})
-        print 'reconstruct image'
+        print 'reconstruct image which has been processed by inverse Z-score'
+        img_rec = img_rec*std + mean
         return np.squeeze(img_rec)
+
 
     def image_disentangle(self, image):
         image = image.astype(np.float32)
@@ -136,6 +181,7 @@ class beta_VAE():
                       feed_dict={self.img: image[np.newaxis, :]})
         print 'disentangle to vector z'
         return z
+
 
     def load_data(self):
         # for i in tqdm(range(20608)):
@@ -156,13 +202,16 @@ class beta_VAE():
         '/home/baxter/Documents/beta-vae/dataset.npy'
         np.save(file_path, self.dataset, allow_pickle=True)
 
+
     def Save(self):
         ckpt_dir = '/home/baxter/Documents/beta-vae/checkpoints/'
         self.saver.save(self.sess, save_path=ckpt_dir+'model.ckpt')
 
+
     def load(self):
         ckpt = tf.train.get_checkpoint_state('/home/baxter/Documents/beta-vae/checkpoints/')
         self.saver.restore(self.sess, save_path=ckpt.model_checkpoint_path)
+
 
     def Enc(self, image, z_dim, is_training=True):
         bn = partial(tf.layers.batch_normalization, training=is_training)

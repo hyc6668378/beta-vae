@@ -9,7 +9,7 @@ from tqdm import tqdm
 import math
 import tensorflow_probability as tfp
 
-conv2d_lrelu = partial(layers.conv2d, activation_fn=tf.nn.leaky_relu, stride=2, padding='valid')
+conv2d_lrelu = partial(layers.conv2d, activation_fn=tf.nn.leaky_relu, stride=2, padding="same")
 fc_relu = partial(tf.layers.dense, activation=tf.nn.relu)
 z_dim = 10
 beta = 4
@@ -24,7 +24,7 @@ def gaussian_log_density(samples, mean, log_var):
     return -0.5 * (tmp * tmp * inv_sigma + log_var + normalization)
 
 class beta_TCVAE():
-    def __init__(self,training = True, lr=0.0008):
+    def __init__(self,training = True, lr=0.0008, trainable= True):
         # input
         self.sess = tf.InteractiveSession()
         self.loss_list= []
@@ -32,12 +32,13 @@ class beta_TCVAE():
         self.z_sample = tf.placeholder(tf.float32, [None, z_dim])
         self.training = training
         self.dataset = []
+        self.trainable = trainable
 
         if str(raw_input('Load_image_dataset?[yes/no] ')) == 'yes':
             self.load_data()
         # ----------------------- Net Architecture -----------------------
         # encode
-        z_mean, z_logvar = self.Enc(self.img, z_dim, is_training= self.training)
+        z_mean, z_logvar = self.Enc(self.img, z_dim, trainable=self.trainable, is_training= self.training)
 
         # sample
         if self.training:
@@ -46,7 +47,7 @@ class beta_TCVAE():
             self.z = z_mean
 
         # decode
-        self.img_rec = self.Dec(self.z, is_training=self.training)
+        self.img_rec = self.Dec(self.z, trainable=self.trainable)
 
         # ----------------------- Loss Definition -----------------------
 
@@ -213,42 +214,39 @@ class beta_TCVAE():
         self.saver.restore(self.sess, save_path=ckpt.model_checkpoint_path)
 
 
-    def Enc(self, image, z_dim, is_training=True):
+    def Enc(self, image, z_dim, trainable, is_training=True):
         bn = partial(tf.layers.batch_normalization, training=is_training)
-        conv2d_lrelu_bn = partial(conv2d_lrelu, normalizer_fn=bn)
+        conv2d_lrelu_bn = partial(conv2d_lrelu, trainable=trainable, normalizer_fn=bn)
+        fc_relu_TA = partial(fc_relu, trainable=trainable)
         with tf.variable_scope('Enc', reuse=tf.AUTO_REUSE):
             image_net = conv2d_lrelu_bn(image, 32, 5)  # |inputs| num_outputs | kernel_size
             image_net = conv2d_lrelu_bn(image_net, 64, 5)
             image_net = conv2d_lrelu_bn(image_net, 128, 3)
             image_net = conv2d_lrelu_bn(image_net, 256, 3)
             image_net = conv2d_lrelu_bn(image_net, 512, 3)
-            image_net = conv2d_lrelu_bn(image_net, 512, 6)
+            image_net = conv2d_lrelu_bn(image_net, 512, 3)
+            image_net = conv2d_lrelu_bn(image_net, 512, 3)
+            image_net = conv2d_lrelu_bn(image_net, 512, 3)
             image_net = layers.flatten(image_net)
-            feature = bn(fc_relu(image_net, z_dim))
-            means = fc_relu(feature, z_dim)
-            log_var = fc_relu(feature, z_dim)
+            feature = bn(fc_relu_TA(image_net, z_dim))
+            means = fc_relu_TA(feature, z_dim)
+            log_var = fc_relu_TA(feature, z_dim)
         return means, log_var
 
-
-    def Dec(self, z, is_training=True):
-        dconv = partial(tf.nn.conv2d_transpose, strides=[1, 2, 2, 1], padding="VALID")
-        relu = partial(tf.nn.relu)
-        bn = partial(tf.layers.batch_normalization, training=is_training)
+    def Dec(self, z, trainable):
+        dconv = partial(tf.layers.conv2d_transpose, strides=2, trainable=trainable,
+                        activation=tf.nn.relu, padding="same")
         with tf.variable_scope('Dec', reuse=tf.AUTO_REUSE):
-            kernel1 = tf.random_normal(shape=[6, 6, 512, 512])
-            kernel2 = tf.random_normal(shape=[3, 3, 256, 512])
-            kernel3 = tf.random_normal(shape=[3, 3, 128, 256])
-            kernel4 = tf.random_normal(shape=[3, 3, 64, 128])
-            kernel5 = tf.random_normal(shape=[5, 5, 32, 64])
-            kernel6 = tf.random_normal(shape=[5, 5, 3, 32])
 
-            net = fc_relu(z, 512)
+            net = fc_relu(z, 512, trainable=trainable)
             net = tf.reshape(net, [tf.shape(z)[0], 1, 1, 512])
-            net = relu(bn(dconv(net, kernel1, [tf.shape(z)[0], 6, 6, 512])))
-            net = relu(bn(dconv(net, kernel2, [tf.shape(z)[0], 14, 14, 256])))
-            net = relu(bn(dconv(net, kernel3, [tf.shape(z)[0], 30, 30, 128])))
-            net = relu(bn(dconv(net, kernel4, [tf.shape(z)[0], 61, 61, 64])))
-            net = relu(bn(dconv(net, kernel5, [tf.shape(z)[0], 126, 126, 32])))
-            image = relu(bn(dconv(net, kernel6, [tf.shape(z)[0], 256, 256, 3])))
+            net = dconv( net, 512, 3)
+            net = dconv( net, 512, 3)
+            net = dconv( net, 512, 3)
+            net = dconv( net, 256, 3)
+            net = dconv( net, 128, 3)
+            net = dconv( net, 64, 3)
+            net = dconv( net, 32, 5)
+            image = dconv( net, 3, 5, activation=None)
 
         return image

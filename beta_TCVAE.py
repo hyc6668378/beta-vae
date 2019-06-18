@@ -69,33 +69,12 @@ class beta_TCVAE():
         self.saver = tf.train.Saver(var_list=var_list, max_to_keep=1)
 
 
-    def bernoulli_loss(self, true_images,
-                       reconstructed_images,
-                       subtract_true_image_entropy=True):
-        """Computes the Bernoulli loss."""
-        flattened_dim = np.prod(true_images.get_shape().as_list()[1:])
-        reconstructed_images = tf.reshape(reconstructed_images, shape=[-1, flattened_dim])
-        true_images = tf.reshape(true_images, shape=[-1, flattened_dim])
-
-        if subtract_true_image_entropy:
-            dist = tfp.distributions.Bernoulli(
-                probs=tf.clip_by_value(true_images, 1e-6, 1 - 1e-6))
-            loss_lower_bound = tf.reduce_sum(dist.entropy(), axis=1)
-        else:
-            loss_lower_bound = 0
-
-        loss = tf.reduce_sum(
-            tf.nn.sigmoid_cross_entropy_with_logits(
-                logits=reconstructed_images, labels=true_images),
-            axis=1)
-        return loss - loss_lower_bound
-
-
     def make_reconstruction_loss(self, true_images,
                                  reconstructed_images):
         """Wrapper that creates reconstruction loss."""
         with tf.variable_scope("reconstruction_loss"):
-            per_sample_loss = self.bernoulli_loss(true_images, reconstructed_images)
+            per_sample_loss = tf.reduce_sum(
+                tf.square(true_images - reconstructed_images), [1, 2, 3])
         return per_sample_loss
 
 

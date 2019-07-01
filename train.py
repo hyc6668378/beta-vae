@@ -23,8 +23,11 @@ epoch = [200, 150, 100, 100, 100, 50, 50]
 lr = [0.0007, 0.0003, 0.0003, 0.0001, 0.0001, 0.00005, 0.00005]
 # beta_TCVAE.load()
 
+if not (len(data_id)==len(data_id)==len(data_id)):
+    raise ValueError('lists length are not same!')
+
 def main():
-    for i in tqdm(range(7)):
+    for i in tqdm(range(len(data_id))):
         beta_TCVAE.lr = lr[i]
         beta_TCVAE.load_data(data_id=data_id[i])
         beta_TCVAE.fit(epoch=epoch[i])

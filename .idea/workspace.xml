@@ -2,11 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="f2871f99-47a0-49cb-a1be-ad4b5c5c7ae7" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/beta_TCVAE.py" beforeDir="false" afterPath="$PROJECT_DIR$/beta_TCVAE.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/beta_VAE_notebook.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/beta_VAE_notebook.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/checkpoints/checkpoint" beforeDir="false" afterPath="$PROJECT_DIR$/checkpoints/checkpoint" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/checkpoints/model.ckpt.data-00000-of-00001" beforeDir="false" afterPath="$PROJECT_DIR$/checkpoints/model.ckpt.data-00000-of-00001" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/checkpoints/model.ckpt.index" beforeDir="false" afterPath="$PROJECT_DIR$/checkpoints/model.ckpt.index" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/checkpoints/model.ckpt.meta" beforeDir="false" afterPath="$PROJECT_DIR$/checkpoints/model.ckpt.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/image_test.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/images2gif.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/train.py" beforeDir="false" afterPath="$PROJECT_DIR$/train.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -19,12 +20,58 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/beta_TCVAE.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="176">
-              <caret line="56" column="11" selection-start-line="56" selection-start-column="11" selection-end-line="56" selection-end-column="11" />
+            <state relative-caret-position="414">
+              <caret line="148" column="31" selection-start-line="148" selection-start-column="31" selection-end-line="148" selection-end-column="31" />
               <folding>
                 <element signature="n#!!doc" />
-                <element signature="e#462#651#0" />
-                <element signature="e#1161#1227#0" />
+                <element signature="e#37#60#0" expanded="true" />
+                <element signature="e#424#613#0" />
+                <element signature="e#3098#3463#0" />
+                <element signature="e#3527#3765#0" />
+                <element signature="e#3830#5554#0" />
+                <element signature="e#3830#4489#1" />
+                <element signature="e#4498#4568#0" />
+                <element signature="e#4888#4956#0" />
+                <element signature="e#5226#5292#0" />
+                <element signature="e#5630#5728#0" />
+                <element signature="e#5804#6044#0" />
+                <element signature="e#6844#6880#0" />
+                <element signature="e#7284#7320#0" />
+                <element signature="e#6816#7851#0" />
+                <element signature="e#6888#7077#0" />
+                <element signature="e#7956#10404#0" />
+                <element signature="e#8240#10374#0" />
+                <element signature="e#8309#8859#0" />
+                <element signature="e#8942#9512#0" />
+                <element signature="e#9594#10144#0" />
+                <element signature="e#10447#12600#0" />
+                <element signature="e#10727#11280#0" />
+                <element signature="e#11363#11927#0" />
+                <element signature="e#12009#12554#0" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/multi_dataset.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="391">
+              <caret line="17" column="56" selection-start-line="17" selection-start-column="4" selection-end-line="17" selection-end-column="56" />
+              <folding>
+                <element signature="e#0#18#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/train.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="607">
+              <caret line="29" column="21" selection-start-line="29" selection-start-column="21" selection-end-line="29" selection-end-column="21" />
+              <folding>
+                <element signature="e#36#69#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -38,6 +85,8 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
+        <option value="$PROJECT_DIR$/multi_dataset.py" />
+        <option value="$PROJECT_DIR$/train.py" />
         <option value="$PROJECT_DIR$/beta_TCVAE.py" />
       </list>
     </option>
@@ -53,7 +102,7 @@
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds" extendedState="6">
+  <component name="ProjectFrameBounds" extendedState="7">
     <option name="x" value="2362" />
     <option name="y" value="440" />
     <option name="width" value="926" />
@@ -79,7 +128,8 @@
     </panes>
   </component>
   <component name="PropertiesComponent">
-    <property name="last_opened_file_path" value="$USER_HOME$/gym" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="settings.editor.selected.configurable" value="Errors" />
   </component>
   <component name="RunDashboard">
@@ -117,8 +167,9 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="1984" y="-4" width="1857" height="1085" extended-state="6" />
+    <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.17521834" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.13537118" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -1303,27 +1354,63 @@
         </state>
       </provider>
     </entry>
+    <entry file="file:///usr/local/lib/python2.7/dist-packages/numpy/lib/npyio.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="433">
+          <caret line="487" column="21" lean-forward="true" selection-start-line="487" selection-start-column="21" selection-end-line="487" selection-end-column="21" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/multi_dataset.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="391">
+          <caret line="17" column="56" selection-start-line="17" selection-start-column="4" selection-end-line="17" selection-end-column="56" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/train.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="607">
+          <caret line="29" column="21" selection-start-line="29" selection-start-column="21" selection-end-line="29" selection-end-column="21" />
+          <folding>
+            <element signature="e#36#69#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/beta_TCVAE.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="176">
-          <caret line="56" column="11" selection-start-line="56" selection-start-column="11" selection-end-line="56" selection-end-column="11" />
+        <state relative-caret-position="414">
+          <caret line="148" column="31" selection-start-line="148" selection-start-column="31" selection-end-line="148" selection-end-column="31" />
           <folding>
             <element signature="n#!!doc" />
-            <element signature="e#462#651#0" />
-            <element signature="e#1161#1227#0" />
-            <element signature="e#3612#3860#0" />
-            <element signature="e#4197#4856#1" />
-            <element signature="e#6171#6411#0" />
-            <element signature="e#6451#6728#0" />
-            <element signature="e#6492#6728#0" />
-            <element signature="e#6554#6728#0" />
-            <element signature="e#6772#7204#0" />
-            <element signature="e#7255#7444#0" />
-            <element signature="e#7480#8170#0" />
-            <element signature="e#7480#7510#0" />
-            <element signature="e#8208#8335#0" />
-            <element signature="e#8366#8491#0" />
-            <element signature="e#8522#8682#0" />
+            <element signature="e#37#60#0" expanded="true" />
+            <element signature="e#424#613#0" />
+            <element signature="e#3098#3463#0" />
+            <element signature="e#3527#3765#0" />
+            <element signature="e#3830#5554#0" />
+            <element signature="e#3830#4489#1" />
+            <element signature="e#4498#4568#0" />
+            <element signature="e#4888#4956#0" />
+            <element signature="e#5226#5292#0" />
+            <element signature="e#5630#5728#0" />
+            <element signature="e#5804#6044#0" />
+            <element signature="e#6844#6880#0" />
+            <element signature="e#7284#7320#0" />
+            <element signature="e#6816#7851#0" />
+            <element signature="e#6888#7077#0" />
+            <element signature="e#7956#10404#0" />
+            <element signature="e#8240#10374#0" />
+            <element signature="e#8309#8859#0" />
+            <element signature="e#8942#9512#0" />
+            <element signature="e#9594#10144#0" />
+            <element signature="e#10447#12600#0" />
+            <element signature="e#10727#11280#0" />
+            <element signature="e#11363#11927#0" />
+            <element signature="e#12009#12554#0" />
           </folding>
         </state>
       </provider>
